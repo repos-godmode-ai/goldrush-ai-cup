@@ -146,14 +146,14 @@ Define CSS variables (you started this in `globals.css`) and **commit to a scale
 ### Shipped (MVP) — *League licence*
 
 - Foundational bundle + pitch + chart + approvals count + verification doc.  
+- **v0.2:** full roster table (sortable), truth tips on stats + chart, `prefers-reduced-motion`, optional `rich=1` summary.  
 - **Exit criterion:** `npm run verify` green; manual matchday happy path with real key.
 
 ### Near (v0.2) — *Press conference polish*
 
-- Tooltip truth layer on every card.  
-- `prefers-reduced-motion`.  
-- **Squad table** view (sortable) beside pitch — same data, better analytics UX.  
-- Optional `with-gas` / `with-transfer-count` behind toggles with **credit estimate** copy.
+**Done in repo:** truth tips (stats + chart), `prefers-reduced-motion` (CSS + Framer), sortable full roster table beside pitch, optional **`with-transfer-count`** (“Rich scout”) with credit call-out.
+
+**Still open:** per-row tooltips on roster cells; optional **`with-gas`** toggle with credit copy; explicit **credit estimate** numbers (not just prose).
 
 ### Mid (v1.0) — *European nights*
 

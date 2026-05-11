@@ -65,3 +65,18 @@ body {
   background-size: 200% 100%;
   animation: grass-shimmer 8s linear infinite;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .flood-beam {
+    animation: none;
+    opacity: 0.45;
+  }
+
+  .grass-shimmer {
+    animation: none;
+  }
+}

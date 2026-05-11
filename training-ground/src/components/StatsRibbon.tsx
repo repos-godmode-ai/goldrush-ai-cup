@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Shield, Shirt, Zap } from "lucide-react";
+import { TruthTip } from "./TruthTip";
 
 type SummaryRow = {
   total_count?: number;
@@ -16,12 +17,16 @@ export function StatsRibbon({
   approvalCount,
   chain,
   address,
+  richScout,
+  reduceMotion,
 }: {
   summary: { items?: SummaryRow[] } | null;
   totalValue: number;
   approvalCount: number;
   chain: string;
   address: string;
+  richScout?: boolean;
+  reduceMotion?: boolean;
 }) {
   const row = summary?.items?.[0];
   const caps = row?.total_count ?? 0;
@@ -36,19 +41,26 @@ export function StatsRibbon({
       icon: Shirt,
       title: "Squad market value",
       value: `$${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
-      sub: "Sum of USD quotes on roster",
+      sub: "Sum of USD quote on each balance row from balances_v2.",
+      tip: "Sum of the `quote` field across items returned by GET /v1/{chain}/address/{wallet}/balances_v2/?quote-currency=USD&no-spam=true. Same tokens you see in the roster table.",
     },
     {
       icon: Zap,
       title: "Career caps",
       value: caps.toLocaleString(),
-      sub: "Total txs logged for this wallet",
+      sub: richScout
+        ? "Total txs + ERC-20 movement count when rich scout is on."
+        : "Total transactions for this wallet on this chain.",
+      tip: richScout
+        ? "From GET …/transactions_summary/?quote-currency=USD&with-transfer-count=true. `total_count` is transactions; `transfer_count` counts Transfer/Deposit/Withdraw style events (+3 credits vs base summary per GoldRush docs)."
+        : "From GET …/transactions_summary/?quote-currency=USD. Uses `items[0].total_count`. Enable Rich scout on the form for `with-transfer-count` (+credits).",
     },
     {
       icon: Shield,
       title: "Contract talks",
       value: approvalCount.toLocaleString(),
-      sub: "Open token approvals (review spenders)",
+      sub: "Rows in the token approvals list for this wallet.",
+      tip: "From GET /v1/{chain}/approvals/{wallet}/ — each item is a token with one or more spender contracts. Review spenders in your wallet app; this UI only counts rows.",
     },
   ];
 
@@ -71,16 +83,19 @@ export function StatsRibbon({
         {cards.map((c, i) => (
           <motion.div
             key={c.title}
-            initial={{ opacity: 0, y: 8 }}
+            initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 * i }}
+            transition={
+              reduceMotion ? { duration: 0 } : { delay: 0.05 * i, duration: 0.3 }
+            }
             className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
           >
-            <c.icon className="mb-2 size-5 text-amber-400" />
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              {c.title}
+            <c.icon className="mb-2 size-5 text-amber-400" aria-hidden />
+            <p className="flex flex-wrap items-center gap-0.5 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              <span>{c.title}</span>
+              <TruthTip label={c.title} detail={c.tip} />
             </p>
-            <p className="mt-1 font-[family-name:var(--font-display)] text-3xl text-white">
+            <p className="mt-1 font-[family-name:var(--font-display)] text-3xl tabular-nums text-white">
               {c.value}
             </p>
             <p className="mt-1 text-xs text-zinc-400">{c.sub}</p>
@@ -90,10 +105,17 @@ export function StatsRibbon({
 
       {transfers != null ? (
         <p className="text-center text-xs text-zinc-500">
-          Transfer window activity (ERC-20 movements):{" "}
-          <strong className="text-zinc-300">{transfers}</strong> — enable{" "}
-          <code className="rounded bg-black/30 px-1">with-transfer-count</code>{" "}
-          on the API for richer scouting (extra credits per skill docs).
+          ERC-20 movement events (transfer window):{" "}
+          <strong className="tabular-nums text-zinc-300">
+            {transfers.toLocaleString()}
+          </strong>
+          {!richScout ? (
+            <>
+              {" "}
+              — turn on <strong className="text-zinc-400">Rich scout</strong> before
+              kick-off to request this field (+credits).
+            </>
+          ) : null}
         </p>
       ) : null}
     </div>

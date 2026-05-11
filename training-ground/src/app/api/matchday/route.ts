@@ -68,6 +68,10 @@ export async function GET(req: NextRequest) {
   }
 
   const enc = encodeURIComponent(address);
+  const richScout = req.nextUrl.searchParams.get("rich") === "1";
+  const summaryPath = richScout
+    ? `/${chain}/address/${enc}/transactions_summary/?quote-currency=USD&with-transfer-count=true`
+    : `/${chain}/address/${enc}/transactions_summary/?quote-currency=USD`;
 
   const [balances, portfolio, summary, approvals] = await Promise.all([
     covalentFetch<unknown>(
@@ -78,10 +82,7 @@ export async function GET(req: NextRequest) {
       `/${chain}/address/${enc}/portfolio_v2/?quote-currency=USD&days=21`,
       key
     ),
-    covalentFetch<{ items?: unknown[] }>(
-      `/${chain}/address/${enc}/transactions_summary/?quote-currency=USD`,
-      key
-    ),
+    covalentFetch<{ items?: unknown[] }>(summaryPath, key),
     covalentFetch<{ items?: unknown[] }>(
       `/${chain}/approvals/${enc}/`,
       key
@@ -115,6 +116,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     chain,
     address,
+    rich_scout: richScout,
     balances: balances.data,
     balances_error: balances.error,
     portfolio_series: series,

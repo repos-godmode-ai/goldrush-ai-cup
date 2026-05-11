@@ -29,9 +29,10 @@ Open [http://localhost:3000](http://localhost:3000), pick a **chain** (kebab-cas
 ## Stack
 
 - Next.js 15 (App Router) + Tailwind CSS v4  
-- Framer Motion (player entrance)  
+- Framer Motion (pitch stagger; respects `prefers-reduced-motion`)  
 - Recharts (valuation curve)  
-- Server route `src/app/api/matchday/route.ts` keeps your API key off the client  
+- Sortable roster table + accessible **TruthTip** (ⓘ) copy tied to GoldRush fields  
+- Server route `src/app/api/matchday/route.ts` keeps your API key off the client; optional `?rich=1` for heavier `transactions_summary`  
 
 ## Notes
 

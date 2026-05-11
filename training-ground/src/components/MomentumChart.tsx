@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 import { Activity } from "lucide-react";
+import { TruthTip } from "./TruthTip";
 
 type Point = { date: string; value: number };
 
@@ -17,10 +18,12 @@ export function MomentumChart({
   series,
   hasPortfolioError,
   isSpotFallback,
+  reduceMotion,
 }: {
   series: Point[];
   hasPortfolioError: boolean;
   isSpotFallback?: boolean;
+  reduceMotion?: boolean;
 }) {
   const chartData = series.map((p) => {
     const d = new Date(p.date);
@@ -39,11 +42,15 @@ export function MomentumChart({
 
   return (
     <section>
-      <div className="mb-4 flex items-center gap-2">
-        <Activity className="size-5 text-amber-400" />
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Activity className="size-5 text-amber-400" aria-hidden />
         <h2 className="font-[family-name:var(--font-display)] text-3xl tracking-wide text-white">
           SEASON MOMENTUM
         </h2>
+        <TruthTip
+          label="Season momentum chart"
+          detail="Primary series: aggregated holding timestamps from GET …/portfolio_v2/?quote-currency=USD&days=21. When that yields no points, the server falls back to two synthetic points at the current balances_v2 USD sum (see amber banner). Y-axis is always USD, not goals or league points."
+        />
       </div>
       <p className="mb-4 text-sm text-zinc-400">
         Aggregated USD valuation from{" "}
@@ -62,8 +69,9 @@ export function MomentumChart({
       ) : null}
 
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 0.35 }}
         className="h-72 rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-black/40 p-4 backdrop-blur-md"
       >
         {empty ? (
