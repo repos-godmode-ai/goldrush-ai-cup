@@ -24,6 +24,8 @@ Open [http://localhost:3000](http://localhost:3000), pick a **chain** (kebab-cas
 
 **Presenter runbook:** [SHOWCASE.md](./SHOWCASE.md)
 
+**Deploy to Vercel:** [DEPLOY_VERCEL.md](./DEPLOY_VERCEL.md)
+
 **Checklist:** [VERIFICATION.md](./VERIFICATION.md)
 
 **Product & technical plan (football × GoldRush × frontend craft):** [ARCHITECTURE.md](./ARCHITECTURE.md)
