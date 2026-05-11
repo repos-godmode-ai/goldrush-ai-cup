@@ -49,6 +49,6 @@ npx vercel --prod
 
 | Issue | Fix |
 |-------|-----|
-| “No Next.js version detected” | Ensure `training-ground/package.json` lists `next` and that `installCommand` completed (check build logs). |
+| “No Next.js version detected” | Root `package.json` must list **`next`** (and `react` / `react-dom`) so Vercel can detect the framework; the real app still installs from `training-ground/` via `vercel.json`. |
 | 503 on `/api/matchday` | Add `GOLDRUSH_API_KEY` (or `COVALENT_API_KEY`) in Vercel env; redeploy. |
 | Wrong OG URL | Set `NEXT_PUBLIC_SITE_URL` to the live `https://…vercel.app` URL. |
