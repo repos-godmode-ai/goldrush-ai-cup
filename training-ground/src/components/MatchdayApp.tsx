@@ -25,6 +25,7 @@ type MatchdayPayload = {
   balances: { items?: BalancePlayer[] } | null;
   balances_error?: boolean;
   portfolio_series: { date: string; value: number }[];
+  portfolio_series_is_fallback?: boolean;
   portfolio_raw_error?: boolean;
   summary: { items?: Record<string, unknown>[] } | null;
   summary_error?: boolean;
@@ -81,7 +82,8 @@ export function MatchdayApp() {
     setClientError(null);
     try {
       const res = await fetch(
-        `/api/matchday?chain=${encodeURIComponent(chain)}&address=${encodeURIComponent(address.trim())}`
+        `/api/matchday?chain=${encodeURIComponent(chain)}&address=${encodeURIComponent(address.trim())}`,
+        { cache: "no-store" }
       );
       const json = (await res.json()) as MatchdayPayload & {
         error?: boolean;
@@ -226,6 +228,20 @@ export function MatchdayApp() {
               transition={{ staggerChildren: 0.08 }}
               className="space-y-8"
             >
+              {data.balances_error ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-start gap-2 rounded-xl border border-amber-500/40 bg-amber-950/40 px-4 py-3 text-sm text-amber-100"
+                >
+                  <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-400" />
+                  <span>
+                    <strong>Balances feed failed.</strong> The pitch may be empty.
+                    Check your API key and chain. Other cards may still load from
+                    partial responses.
+                  </span>
+                </motion.div>
+              ) : null}
               <StatsRibbon
                 summary={data.summary}
                 totalValue={totalValue}
@@ -237,6 +253,7 @@ export function MatchdayApp() {
               <MomentumChart
                 series={data.portfolio_series}
                 hasPortfolioError={Boolean(data.portfolio_raw_error)}
+                isSpotFallback={Boolean(data.portfolio_series_is_fallback)}
               />
               {data.partial_errors?.length ? (
                 <p className="text-center text-xs text-amber-200/80">

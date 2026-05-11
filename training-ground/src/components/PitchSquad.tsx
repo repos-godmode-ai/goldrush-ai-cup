@@ -29,6 +29,8 @@ function formIcon(p: BalancePlayer) {
 }
 
 export function PitchSquad({ squad }: { squad: BalancePlayer[] }) {
+  const empty = squad.length === 0;
+
   return (
     <section>
       <div className="mb-4 flex items-end justify-between gap-4">
@@ -42,6 +44,13 @@ export function PitchSquad({ squad }: { squad: BalancePlayer[] }) {
           </p>
         </div>
       </div>
+
+      {empty ? (
+        <div className="mb-4 rounded-xl border border-amber-500/35 bg-amber-950/35 px-4 py-3 text-sm text-amber-100">
+          No <strong>priced</strong> outfield tokens (spam filtered, no dust/NFT
+          with USD quote). Try another address or chain — or fund this wallet.
+        </div>
+      ) : null}
 
       <div className="relative overflow-hidden rounded-3xl border-2 border-white/25 shadow-2xl shadow-black/60">
         {/* Crowd */}

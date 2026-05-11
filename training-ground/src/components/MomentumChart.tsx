@@ -16,17 +16,24 @@ type Point = { date: string; value: number };
 export function MomentumChart({
   series,
   hasPortfolioError,
+  isSpotFallback,
 }: {
   series: Point[];
   hasPortfolioError: boolean;
+  isSpotFallback?: boolean;
 }) {
-  const chartData = series.map((p) => ({
-    ...p,
-    label: new Date(p.date).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-    }),
-  }));
+  const chartData = series.map((p) => {
+    const d = new Date(p.date);
+    const label = Number.isNaN(d.getTime())
+      ? p.date
+      : d.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+    return { ...p, label };
+  });
 
   const empty = !chartData.length;
 
@@ -44,6 +51,15 @@ export function MomentumChart({
         holdings time series (when exposed by the API). Think of it as your
         club&apos;s league position over the last few matchweeks.
       </p>
+      {isSpotFallback ? (
+        <p className="mb-3 rounded-lg border border-amber-500/30 bg-amber-950/30 px-3 py-2 text-xs text-amber-100/95">
+          <strong>Spot estimate:</strong> no historical buckets parsed from{" "}
+          <code className="rounded bg-black/30 px-1">portfolio_v2</code> for
+          this wallet — showing a flat line at the current{" "}
+          <code className="rounded bg-black/30 px-1">balances_v2</code> USD
+          total so the chart still renders.
+        </p>
+      ) : null}
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}

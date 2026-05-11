@@ -14,16 +14,36 @@ export async function covalentFetch<T>(
   path: string,
   apiKey: string
 ): Promise<CovalentEnvelope<T>> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      Accept: "application/json",
-    },
-    next: { revalidate: 30 },
-  });
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        Accept: "application/json",
+      },
+      /** Never cache per-wallet responses (would leak data across users in prod). */
+      cache: "no-store",
+    });
 
-  const json = (await res.json()) as CovalentEnvelope<T>;
-  return json;
+    const text = await res.text();
+    let json: CovalentEnvelope<T>;
+    try {
+      json = JSON.parse(text) as CovalentEnvelope<T>;
+    } catch {
+      return {
+        data: null,
+        error: true,
+        error_message: `Upstream returned non-JSON (HTTP ${res.status}).`,
+      };
+    }
+    return json;
+  } catch (e) {
+    return {
+      data: null,
+      error: true,
+      error_message:
+        e instanceof Error ? e.message : "Network error calling GoldRush API.",
+    };
+  }
 }
 
 /** Sum portfolio holdings across tokens into one time series for charts */
@@ -59,9 +79,25 @@ export function aggregatePortfolioSeries(
     }
   }
 
-  return [...bucket.entries()]
+  const sorted = [...bucket.entries()]
     .map(([date, value]) => ({ date, value }))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  return sorted;
+}
+
+/** Flat “season” line from current spot USD so the chart is never empty when balances exist. */
+export function spotValuationFallbackSeries(totalUsd: number): {
+  date: string;
+  value: number;
+}[] {
+  if (!Number.isFinite(totalUsd) || totalUsd <= 0) return [];
+  const now = new Date().toISOString();
+  const t2 = new Date(Date.now() + 60_000).toISOString();
+  return [
+    { date: now, value: totalUsd },
+    { date: t2, value: totalUsd },
+  ];
 }
 
 function num(x: unknown): number | null {

@@ -3,7 +3,10 @@ import {
   aggregatePortfolioSeries,
   covalentFetch,
   isValidEvmAddress,
+  spotValuationFallbackSeries,
 } from "@/lib/covalent";
+
+export const dynamic = "force-dynamic";
 
 const ALLOWED_CHAINS = new Set([
   "base-mainnet",
@@ -15,14 +18,22 @@ const ALLOWED_CHAINS = new Set([
   "gnosis-mainnet",
 ]);
 
+function resolveApiKey(): string | undefined {
+  return (
+    process.env.GOLDRUSH_API_KEY?.trim() ||
+    process.env.COVALENT_API_KEY?.trim() ||
+    process.env.COVALENTHQ_API_KEY?.trim()
+  );
+}
+
 export async function GET(req: NextRequest) {
-  const key = process.env.GOLDRUSH_API_KEY;
+  const key = resolveApiKey();
   if (!key) {
     return NextResponse.json(
       {
         error: true,
         error_message:
-          "Set GOLDRUSH_API_KEY in training-ground/.env.local (see README).",
+          "Set GOLDRUSH_API_KEY (or COVALENT_API_KEY) in training-ground/.env.local — see README.",
       },
       { status: 503 }
     );
@@ -86,7 +97,20 @@ export async function GET(req: NextRequest) {
   const portfolioItems = (portfolio.data?.items ?? []) as Parameters<
     typeof aggregatePortfolioSeries
   >[0];
-  const series = aggregatePortfolioSeries(portfolioItems);
+  let series = aggregatePortfolioSeries(portfolioItems);
+
+  const balanceItems =
+    (
+      balances.data as {
+        items?: { quote?: number }[];
+      } | null
+    )?.items ?? [];
+  const spotUsdTotal = balanceItems.reduce((s, t) => s + (t.quote ?? 0), 0);
+  let portfolio_series_is_fallback = false;
+  if (!series.length && spotUsdTotal > 0) {
+    series = spotValuationFallbackSeries(spotUsdTotal);
+    portfolio_series_is_fallback = true;
+  }
 
   return NextResponse.json({
     chain,
@@ -94,6 +118,7 @@ export async function GET(req: NextRequest) {
     balances: balances.data,
     balances_error: balances.error,
     portfolio_series: series,
+    portfolio_series_is_fallback,
     portfolio_raw_error: portfolio.error,
     summary: summary.data,
     summary_error: summary.error,

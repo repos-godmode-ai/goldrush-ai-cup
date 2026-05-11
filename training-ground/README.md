@@ -14,12 +14,15 @@ A **football-themed** on-chain portfolio UI that only uses **GoldRush Foundation
 ```bash
 cd training-ground
 cp .env.example .env.local
-# Edit .env.local — set GOLDRUSH_API_KEY from https://goldrush.dev/platform/
+# Set GOLDRUSH_API_KEY or COVALENT_API_KEY — https://goldrush.dev/platform/
 npm install
+npm run verify
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000), pick a **chain** (kebab-case, e.g. `base-mainnet`), enter a **0x** address or **ENS**, then **Kick off matchday**.
+
+**Checklist:** [VERIFICATION.md](./VERIFICATION.md) (build, API errors, optional curl checks).
 
 ## Stack
 
@@ -31,4 +34,4 @@ Open [http://localhost:3000](http://localhost:3000), pick a **chain** (kebab-cas
 ## Notes
 
 - This is **on-chain data only**; theming is metaphorical.  
-- If the momentum chart is empty, the API may use different `holdings` field shapes; squad cards still reflect live `balances_v2`.  
+- If `portfolio_v2` does not yield a parseable time series, the app shows a **spot fallback** line (current USD total from `balances_v2`) so the chart always has something useful when the wallet has value.
