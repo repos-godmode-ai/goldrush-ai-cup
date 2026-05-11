@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+:root {
+  --pitch: #1a4d2e;
+  --pitch-light: #2d6b45;
+  --pitch-line: rgba(255, 255, 255, 0.85);
+  --stadium: #0a1628;
+  --flood: rgba(255, 250, 220, 0.12);
+  --accent: #fbbf24;
+  --accent-hot: #f97316;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: radial-gradient(ellipse 120% 80% at 50% -20%, #1e3a5f 0%, var(--stadium) 45%, #050a12 100%);
+  min-height: 100vh;
+}
+
+/* Stadium floodlight sweep */
+@keyframes flood-sweep {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.flood-beam {
+  animation: flood-sweep 5s ease-in-out infinite;
+}
+
+/* Pitch stripes */
+.pitch-stripes {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--pitch) 0px,
+    var(--pitch) 28px,
+    var(--pitch-light) 28px,
+    var(--pitch-light) 56px
+  );
+}
+
+/* Subtle grass shimmer */
+@keyframes grass-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.grass-shimmer {
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 45%,
+    transparent 90%
+  );
+  background-size: 200% 100%;
+  animation: grass-shimmer 8s linear infinite;
+}
