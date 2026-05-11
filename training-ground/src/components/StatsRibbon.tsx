@@ -11,6 +11,14 @@ type SummaryRow = {
   latest_transaction?: { block_signed_at?: string };
 };
 
+type CardDef = {
+  icon: typeof Shirt;
+  title: string;
+  value: string;
+  sub: string;
+  tip: string;
+};
+
 export function StatsRibbon({
   summary,
   totalValue,
@@ -18,7 +26,10 @@ export function StatsRibbon({
   chain,
   address,
   richScout,
+  gasScout,
+  approvalsError,
   reduceMotion,
+  onOpenApprovals,
 }: {
   summary: { items?: SummaryRow[] } | null;
   totalValue: number;
@@ -26,7 +37,10 @@ export function StatsRibbon({
   chain: string;
   address: string;
   richScout?: boolean;
+  gasScout?: boolean;
+  approvalsError?: boolean;
   reduceMotion?: boolean;
+  onOpenApprovals?: () => void;
 }) {
   const row = summary?.items?.[0];
   const caps = row?.total_count ?? 0;
@@ -36,7 +50,19 @@ export function StatsRibbon({
       ? new Date(row.latest_transaction.block_signed_at).toLocaleDateString()
       : "—";
 
-  const cards = [
+  const summaryTipParts = [
+    "From GET …/transactions_summary/ with quote-currency=USD.",
+    richScout ? "`with-transfer-count=true` (+3 credits)." : null,
+    gasScout ? "`with-gas=true` (+1 credit per skill docs)." : null,
+    "`items[0].total_count` is career caps.",
+    richScout
+      ? "`transfer_count` counts ERC-20 movement style events when returned."
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const cards: CardDef[] = [
     {
       icon: Shirt,
       title: "Squad market value",
@@ -48,21 +74,36 @@ export function StatsRibbon({
       icon: Zap,
       title: "Career caps",
       value: caps.toLocaleString(),
-      sub: richScout
-        ? "Total txs + ERC-20 movement count when rich scout is on."
-        : "Total transactions for this wallet on this chain.",
-      tip: richScout
-        ? "From GET …/transactions_summary/?quote-currency=USD&with-transfer-count=true. `total_count` is transactions; `transfer_count` counts Transfer/Deposit/Withdraw style events (+3 credits vs base summary per GoldRush docs)."
-        : "From GET …/transactions_summary/?quote-currency=USD. Uses `items[0].total_count`. Enable Rich scout on the form for `with-transfer-count` (+credits).",
+      sub:
+        richScout || gasScout
+          ? "Summary with optional rich / gas flags (see ⓘ)."
+          : "Total transactions for this wallet on this chain.",
+      tip: summaryTipParts,
     },
     {
       icon: Shield,
       title: "Contract talks",
       value: approvalCount.toLocaleString(),
-      sub: "Rows in the token approvals list for this wallet.",
-      tip: "From GET /v1/{chain}/approvals/{wallet}/ — each item is a token with one or more spender contracts. Review spenders in your wallet app; this UI only counts rows.",
+      sub:
+        approvalCount > 0 && !approvalsError
+          ? "Click this card to review spenders."
+          : "Rows in the token approvals list for this wallet.",
+      tip: "From GET /v1/{chain}/approvals/{wallet}/ — each item is a token with one or more spender contracts. Review spenders in your wallet app; this UI lists rows.",
     },
   ];
+
+  const motionProps = (i: number) => ({
+    initial: reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0 },
+    transition: reduceMotion
+      ? { duration: 0 }
+      : { delay: 0.05 * i, duration: 0.3 },
+  });
+
+  const canOpenApprovals =
+    Boolean(onOpenApprovals) &&
+    approvalCount > 0 &&
+    !approvalsError;
 
   return (
     <div className="space-y-4">
@@ -80,27 +121,46 @@ export function StatsRibbon({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        {cards.map((c, i) => (
-          <motion.div
-            key={c.title}
-            initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={
-              reduceMotion ? { duration: 0 } : { delay: 0.05 * i, duration: 0.3 }
-            }
-            className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
-          >
-            <c.icon className="mb-2 size-5 text-amber-400" aria-hidden />
-            <p className="flex flex-wrap items-center gap-0.5 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              <span>{c.title}</span>
-              <TruthTip label={c.title} detail={c.tip} />
-            </p>
-            <p className="mt-1 font-[family-name:var(--font-display)] text-3xl tabular-nums text-white">
-              {c.value}
-            </p>
-            <p className="mt-1 text-xs text-zinc-400">{c.sub}</p>
-          </motion.div>
-        ))}
+        {cards.map((c, i) => {
+          const isApprovals = c.title === "Contract talks";
+          const inner = (
+            <>
+              <c.icon className="mb-2 size-5 text-amber-400" aria-hidden />
+              <p className="flex flex-wrap items-center gap-0.5 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                <span>{c.title}</span>
+                <TruthTip label={c.title} detail={c.tip} />
+              </p>
+              <p className="mt-1 font-[family-name:var(--font-display)] text-3xl tabular-nums text-white">
+                {c.value}
+              </p>
+              <p className="mt-1 text-xs text-zinc-400">{c.sub}</p>
+            </>
+          );
+
+          if (isApprovals && canOpenApprovals) {
+            return (
+              <motion.button
+                key={c.title}
+                type="button"
+                {...motionProps(i)}
+                onClick={onOpenApprovals}
+                className="rounded-2xl border border-amber-500/30 bg-amber-950/20 p-4 text-left backdrop-blur-sm transition hover:border-amber-400/50 hover:bg-amber-950/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60"
+              >
+                {inner}
+              </motion.button>
+            );
+          }
+
+          return (
+            <motion.div
+              key={c.title}
+              {...motionProps(i)}
+              className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
+            >
+              {inner}
+            </motion.div>
+          );
+        })}
       </div>
 
       {transfers != null ? (

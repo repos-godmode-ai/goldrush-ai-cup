@@ -146,7 +146,7 @@ Define CSS variables (you started this in `globals.css`) and **commit to a scale
 ### Shipped (MVP) — *League licence*
 
 - Foundational bundle + pitch + chart + approvals count + verification doc.  
-- **v0.2:** full roster table (sortable), truth tips on stats + chart, `prefers-reduced-motion`, optional `rich=1` summary.  
+- **v0.3:** showcase bar + demo presets (one-click load), loading skeleton, recent clubs (`localStorage`), **Contract talks** modal (spenders), optional **`with-gas`** on summary, presenter **SHOWCASE.md** runbook.  
 - **Exit criterion:** `npm run verify` green; manual matchday happy path with real key.
 
 ### Near (v0.2) — *Press conference polish*

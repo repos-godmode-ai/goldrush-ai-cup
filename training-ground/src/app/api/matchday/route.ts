@@ -69,9 +69,12 @@ export async function GET(req: NextRequest) {
 
   const enc = encodeURIComponent(address);
   const richScout = req.nextUrl.searchParams.get("rich") === "1";
-  const summaryPath = richScout
-    ? `/${chain}/address/${enc}/transactions_summary/?quote-currency=USD&with-transfer-count=true`
-    : `/${chain}/address/${enc}/transactions_summary/?quote-currency=USD`;
+  const gasScout = req.nextUrl.searchParams.get("gas") === "1";
+
+  const summaryParams = new URLSearchParams({ "quote-currency": "USD" });
+  if (richScout) summaryParams.set("with-transfer-count", "true");
+  if (gasScout) summaryParams.set("with-gas", "true");
+  const summaryPath = `/${chain}/address/${enc}/transactions_summary/?${summaryParams.toString()}`;
 
   const [balances, portfolio, summary, approvals] = await Promise.all([
     covalentFetch<unknown>(
@@ -117,6 +120,7 @@ export async function GET(req: NextRequest) {
     chain,
     address,
     rich_scout: richScout,
+    gas_scout: gasScout,
     balances: balances.data,
     balances_error: balances.error,
     portfolio_series: series,

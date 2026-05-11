@@ -22,7 +22,9 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000), pick a **chain** (kebab-case, e.g. `base-mainnet`), enter a **0x** address or **ENS**, then **Kick off matchday**.
 
-**Checklist:** [VERIFICATION.md](./VERIFICATION.md) (build, API errors, optional curl checks).
+**Presenter runbook:** [SHOWCASE.md](./SHOWCASE.md)
+
+**Checklist:** [VERIFICATION.md](./VERIFICATION.md)
 
 **Product & technical plan (football × GoldRush × frontend craft):** [ARCHITECTURE.md](./ARCHITECTURE.md)
 

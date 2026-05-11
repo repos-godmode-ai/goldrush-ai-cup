@@ -34,6 +34,7 @@ With dev server running:
 | Bad address | `curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:3000/api/matchday?chain=base-mainnet&address=0xbad"` | `400` |
 | Good shape | `curl -s "http://127.0.0.1:3000/api/matchday?chain=base-mainnet&address=0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045" \| head -c 200` | JSON with `balances`, `portfolio_series`, `partial_errors` |
 | Rich scout | Same URL with `&rich=1` (needs valid API key) | JSON includes `rich_scout: true` and may include `transfer_count` in summary |
+| Gas scout | Same URL with `&gas=1` | JSON includes `gas_scout: true`; summary may include `gas_summary` (+1 credit) |
 
 > **Note:** Without an API key, `/api/matchday` returns **503** for any address — use a dummy key to test **400** validation only.
 

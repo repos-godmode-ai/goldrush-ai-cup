@@ -14,9 +14,18 @@ const body = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Training Ground — GoldRush Squad Lab",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+  ),
+  title: "Training Ground — GoldRush Showcase",
   description:
-    "World Cup–themed on-chain portfolio manager powered by GoldRush Foundational API.",
+    "Football-themed live portfolio demo: GoldRush Foundational balances, portfolio curve, transaction summary, and token approvals.",
+  openGraph: {
+    title: "Training Ground — GoldRush Showcase",
+    description:
+      "Live on-chain squad view powered by GoldRush Foundational API — pitch, roster, charts, approvals.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
