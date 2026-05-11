@@ -24,6 +24,8 @@ Open [http://localhost:3000](http://localhost:3000), pick a **chain** (kebab-cas
 
 **Checklist:** [VERIFICATION.md](./VERIFICATION.md) (build, API errors, optional curl checks).
 
+**Product & technical plan (football × GoldRush × frontend craft):** [ARCHITECTURE.md](./ARCHITECTURE.md)
+
 ## Stack
 
 - Next.js 15 (App Router) + Tailwind CSS v4  
