@@ -1,53 +1,47 @@
 # Deploy Training Ground to Vercel
 
-The Next.js app lives in **`training-ground/`**. Vercel must use that folder as the **Root Directory**.
+The Next.js app lives in **`training-ground/`**, but the repository now includes a **root `vercel.json`** so you can import the GitHub repo with **Root Directory left at `.` (repository root)**. You no longer need to pick a subfolder in the Vercel UI.
 
-## Option A — GitHub (recommended, ~3 minutes)
+## Option A — GitHub import (recommended)
 
-1. Push this repo (or merge PR **#2**) so `main` includes `training-ground/`.
-2. In [Vercel Dashboard](https://vercel.com/new) → **Add New…** → **Project** → **Import** your Git repository.
-3. Under **Configure Project**:
-   - **Root Directory**: click **Edit** → set to `training-ground` (not the repo root).
-   - **Framework Preset**: Next.js (auto-detected).
-   - **Build Command**: `npm run build` (default).
-   - **Output**: leave default (Next handles `.next`).
-4. **Environment Variables** (Production + Preview):
-   - `GOLDRUSH_API_KEY` = your key from [goldrush.dev/platform](https://goldrush.dev/platform/)  
-     *or* `COVALENT_API_KEY` if you use that name (the app accepts either).
-   - After the first deploy, add **`NEXT_PUBLIC_SITE_URL`** = your production URL (e.g. `https://your-app.vercel.app`) so Open Graph `metadataBase` is correct.
-5. **Deploy**. First build runs `npm ci` + `next build` from `training-ground/`.
+1. Merge **`main`** on GitHub so it includes `vercel.json`, `package.json`, and `training-ground/` (see repo history / PR **#2**).
+2. [Vercel](https://vercel.com/new) → **Import** this repository.
+3. **Root Directory:** leave as **`./`** (default / repository root).
+4. **Framework:** Next.js (auto-detected from `vercel.json` + app build).
+5. **Environment variables** (Production + Preview if you want previews to work):
+   - `GOLDRUSH_API_KEY` or `COVALENT_API_KEY` — from [goldrush.dev/platform](https://goldrush.dev/platform/)
+   - After first deploy: `NEXT_PUBLIC_SITE_URL` = your production URL (e.g. `https://your-project.vercel.app`)
+6. **Deploy.**
 
-### After deploy
+Install and build are defined in root `vercel.json`:
 
-- Open the `.vercel.app` URL; use **demo presets** or **Kick off matchday**.
-- If the API returns **503**, the env var is missing or misspelled in the Vercel project settings.
+- `npm ci --prefix training-ground`
+- `npm run build --prefix training-ground`
+
+### Optional: deploy only `training-ground/` as root
+
+If you prefer the classic layout, set **Root Directory** to `training-ground` in Vercel and remove or ignore root `vercel.json` overrides (not recommended once root deploy is set up).
 
 ---
 
-## Option B — Vercel CLI (from your laptop)
+## Option B — Vercel CLI
+
+From the **repository root** (not inside `training-ground/`):
 
 ```bash
-cd training-ground
-npx vercel login          # browser or device code
-npx vercel link           # create/link project
+npx vercel login
+npx vercel link
 npx vercel env add GOLDRUSH_API_KEY production
 npx vercel --prod
 ```
 
-Set `NEXT_PUBLIC_SITE_URL` when you know the production hostname:
-
-```bash
-npx vercel env add NEXT_PUBLIC_SITE_URL production
-# paste https://<your-project>.vercel.app
-```
-
 ---
 
-## Option C — GitHub Actions (manual)
+## Option C — GitHub Actions
 
-1. Create a Vercel project and add **Org ID** + **Project ID** (Project → Settings → General) and a [token](https://vercel.com/account/tokens).
-2. In GitHub: **Settings → Secrets and variables → Actions** add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
-3. Run workflow **Deploy Training Ground to Vercel** under **Actions → workflow_dispatch** (file: `.github/workflows/deploy-training-ground.yml`).
+1. Create a Vercel project (Option A once) and add **Org ID**, **Project ID**, and a [token](https://vercel.com/account/tokens).
+2. GitHub → **Settings → Secrets → Actions**: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+3. Run **Deploy Training Ground to Vercel** (workflow_dispatch). The workflow runs from repo root.
 
 ---
 
@@ -55,6 +49,6 @@ npx vercel env add NEXT_PUBLIC_SITE_URL production
 
 | Issue | Fix |
 |-------|-----|
-| Build fails “Cannot find module” | Root Directory must be **`training-ground`**, not repo root. |
-| 503 on `/api/matchday` | Add `GOLDRUSH_API_KEY` or `COVALENT_API_KEY` in Vercel **Environment Variables**; redeploy. |
-| Wrong OG / canonical URL | Set `NEXT_PUBLIC_SITE_URL` to the live `https://…vercel.app` URL. |
+| “No Next.js version detected” | Ensure `training-ground/package.json` lists `next` and that `installCommand` completed (check build logs). |
+| 503 on `/api/matchday` | Add `GOLDRUSH_API_KEY` (or `COVALENT_API_KEY`) in Vercel env; redeploy. |
+| Wrong OG URL | Set `NEXT_PUBLIC_SITE_URL` to the live `https://…vercel.app` URL. |

@@ -1,6 +1,5 @@
 name: Deploy Training Ground to Vercel
 
-# Run manually after you add repo secrets (see training-ground/DEPLOY_VERCEL.md).
 on:
   workflow_dispatch:
 
@@ -25,12 +24,11 @@ jobs:
             echo "deploy=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Deploy to Vercel
+      - name: Deploy to Vercel (repo root; vercel.json runs build in training-ground)
         if: steps.meta.outputs.deploy == 'true'
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: training-ground
           vercel-args: "--prod"

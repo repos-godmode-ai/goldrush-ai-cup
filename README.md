@@ -4,6 +4,8 @@
 
 Football-themed **GoldRush Foundational** dashboard (pitch, XI, charts): see [`training-ground/README.md`](training-ground/README.md). Run with `GOLDRUSH_API_KEY` in `training-ground/.env.local`.
 
+**Vercel:** import this repo with **Root Directory = `./`** (repo root). Root [`vercel.json`](vercel.json) installs and builds [`training-ground/`](training-ground/). Details: [`training-ground/DEPLOY_VERCEL.md`](training-ground/DEPLOY_VERCEL.md).
+
 ---
 
 This repository includes **GoldRush Agent Skills** so you (and Cursor) can see exactly what each skill contains, reinstall from upstream, and run the CLI to verify connectivity.
