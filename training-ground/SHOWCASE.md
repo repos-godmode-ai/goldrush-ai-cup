@@ -4,7 +4,7 @@ Use this when presenting **Training Ground** live.
 
 ## Before you go on camera
 
-1. `cd training-ground && cp .env.example .env.local` and set **`GOLDRUSH_API_KEY`** (or **`COVALENT_API_KEY`**).
+1. From repo root: `npm install` then `cp training-ground/.env.example training-ground/.env.local` and set **`GOLDRUSH_API_KEY`** (or **`COVALENT_API_KEY`**).
 2. `npm run verify` then `npm run dev`.
 3. Open **http://localhost:3000** in a clean window (or incognito).
 

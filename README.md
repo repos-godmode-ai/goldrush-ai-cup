@@ -4,7 +4,7 @@
 
 Football-themed **GoldRush Foundational** dashboard (pitch, XI, charts): see [`training-ground/README.md`](training-ground/README.md). Run with `GOLDRUSH_API_KEY` in `training-ground/.env.local`.
 
-**Vercel:** import this repo with **Root Directory = `./`** (repo root). Root [`vercel.json`](vercel.json) installs and builds [`training-ground/`](training-ground/). Root [`package.json`](package.json) includes **`next`** so Vercel’s framework detector succeeds. Details: [`training-ground/DEPLOY_VERCEL.md`](training-ground/DEPLOY_VERCEL.md).
+**Vercel:** import this repo with **Root Directory = `./`**. The repo is an **npm workspace** (`training-ground`); root `npm ci` hoists **`next`** so Vercel detects Next.js. Root [`vercel.json`](vercel.json) runs `npm run build -w training-ground`. Details: [`training-ground/DEPLOY_VERCEL.md`](training-ground/DEPLOY_VERCEL.md).
 
 ---
 

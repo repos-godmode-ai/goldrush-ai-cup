@@ -1,32 +1,37 @@
 # Deploy Training Ground to Vercel
 
-The Next.js app lives in **`training-ground/`**, but the repository now includes a **root `vercel.json`** so you can import the GitHub repo with **Root Directory left at `.` (repository root)**. You no longer need to pick a subfolder in the Vercel UI.
+The repo uses an **npm workspace**: the Next.js app is the **`training-ground`** package. The **root** `package-lock.json` installs dependencies and **hoists `next` to `node_modules/next`**, which satisfies Vercel’s “Next.js version detected” check when **Root Directory = `./`** (repository root).
 
-## Option A — GitHub import (recommended)
+## Root Directory
 
-1. Merge **`main`** on GitHub so it includes `vercel.json`, `package.json`, and `training-ground/` (see repo history / PR **#2**).
-2. [Vercel](https://vercel.com/new) → **Import** this repository.
-3. **Root Directory:** leave as **`./`** (default / repository root).
-4. **Framework:** Next.js (auto-detected from `vercel.json` + app build).
-5. **Environment variables** (Production + Preview if you want previews to work):
-   - `GOLDRUSH_API_KEY` or `COVALENT_API_KEY` — from [goldrush.dev/platform](https://goldrush.dev/platform/)
-   - After first deploy: `NEXT_PUBLIC_SITE_URL` = your production URL (e.g. `https://your-project.vercel.app`)
-6. **Deploy.**
+Use **repository root** (`./` / default). Do **not** point Vercel only at `training-ground` unless you also copy a lockfile there — the supported layout is **workspace root + `vercel.json`**.
 
-Install and build are defined in root `vercel.json`:
+## What Vercel runs (from root `vercel.json`)
 
-- `npm ci --prefix training-ground`
-- `npm run build --prefix training-ground`
+| Step | Command |
+|------|---------|
+| Install | `npm ci` |
+| Build | `npm run build -w training-ground` |
 
-### Optional: deploy only `training-ground/` as root
+## Option A — GitHub import
 
-If you prefer the classic layout, set **Root Directory** to `training-ground` in Vercel and remove or ignore root `vercel.json` overrides (not recommended once root deploy is set up).
+1. Import this repo on **latest `main`** (includes root `package-lock.json` and workspace `package.json`).
+2. **Root Directory:** `./` (default).
+3. **Environment variables:** `GOLDRUSH_API_KEY` or `COVALENT_API_KEY` (Production + Preview as needed).
+4. Optional after first deploy: `NEXT_PUBLIC_SITE_URL` = your `https://….vercel.app` URL.
+5. Deploy.
 
----
+## Troubleshooting
 
-## Option B — Vercel CLI
+| Issue | Fix |
+|-------|-----|
+| “No Next.js version detected” | Use **latest `main`**; ensure **Root Directory is repo root**; root `npm ci` must run (see `vercel.json`). Do not delete root `package-lock.json`. |
+| 503 on `/api/matchday` | Set `GOLDRUSH_API_KEY` (or `COVALENT_API_KEY`) in Vercel env; redeploy. |
+| Wrong OG URL | Set `NEXT_PUBLIC_SITE_URL` to the live production URL. |
 
-From the **repository root** (not inside `training-ground/`):
+## Option B — CLI
+
+From repository root:
 
 ```bash
 npx vercel login
@@ -35,20 +40,6 @@ npx vercel env add GOLDRUSH_API_KEY production
 npx vercel --prod
 ```
 
----
-
 ## Option C — GitHub Actions
 
-1. Create a Vercel project (Option A once) and add **Org ID**, **Project ID**, and a [token](https://vercel.com/account/tokens).
-2. GitHub → **Settings → Secrets → Actions**: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
-3. Run **Deploy Training Ground to Vercel** (workflow_dispatch). The workflow runs from repo root.
-
----
-
-## Troubleshooting
-
-| Issue | Fix |
-|-------|-----|
-| “No Next.js version detected” | Root `package.json` must list **`next`** (and `react` / `react-dom`) so Vercel can detect the framework; the real app still installs from `training-ground/` via `vercel.json`. |
-| 503 on `/api/matchday` | Add `GOLDRUSH_API_KEY` (or `COVALENT_API_KEY`) in Vercel env; redeploy. |
-| Wrong OG URL | Set `NEXT_PUBLIC_SITE_URL` to the live `https://…vercel.app` URL. |
+See `.github/workflows/deploy-training-ground.yml` — set `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, then run the workflow manually.

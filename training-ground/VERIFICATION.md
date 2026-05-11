@@ -4,20 +4,21 @@ Use this checklist whenever you change the app or upgrade dependencies.
 
 ## 1. Install and build (no API key required)
 
+From the **repository root** (workspace installs all packages including `next` at root for tooling):
+
 ```bash
-cd training-ground
 npm ci
-npm run verify
+npm run verify -w training-ground
 ```
 
-`npm run verify` runs `next build` and must finish with **Compiled successfully**.
+`npm run verify` runs `next build` in the `training-ground` workspace and must finish with **Compiled successfully**.
 
 ## 2. API key and dev server
 
 ```bash
-cp .env.example .env.local
+cp training-ground/.env.example training-ground/.env.local
 # Set GOLDRUSH_API_KEY=... from https://goldrush.dev/platform/
-npm run dev
+npm run dev -w training-ground
 ```
 
 Open **http://localhost:3000** and click **Kick off matchday** with the default address.

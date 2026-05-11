@@ -11,13 +11,14 @@ A **football-themed** on-chain portfolio UI that only uses **GoldRush Foundation
 
 ## Run locally
 
+From the **repository root** (npm workspace):
+
 ```bash
-cd training-ground
-cp .env.example .env.local
-# Set GOLDRUSH_API_KEY or COVALENT_API_KEY — https://goldrush.dev/platform/
 npm install
-npm run verify
-npm run dev
+cp training-ground/.env.example training-ground/.env.local
+# Set GOLDRUSH_API_KEY or COVALENT_API_KEY — https://goldrush.dev/platform/
+npm run verify -w training-ground
+npm run dev -w training-ground
 ```
 
 Open [http://localhost:3000](http://localhost:3000), pick a **chain** (kebab-case, e.g. `base-mainnet`), enter a **0x** address or **ENS**, then **Kick off matchday**.

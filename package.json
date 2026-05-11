@@ -1,16 +1,12 @@
 {
   "name": "goldrush-ai-cup",
   "private": true,
-  "description": "Repository root — Next.js app lives in training-ground/. Root deps satisfy Vercel Next.js detection; install/build run in training-ground/.",
+  "description": "npm workspace root — Next.js app is the training-ground workspace. Vercel runs npm ci here so next is hoisted and framework detection passes.",
+  "workspaces": ["training-ground"],
   "scripts": {
-    "build": "npm ci --prefix training-ground && npm run build --prefix training-ground",
-    "dev": "npm run dev --prefix training-ground",
-    "verify": "npm run verify --prefix training-ground"
-  },
-  "dependencies": {
-    "next": "^15.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "build": "npm run build -w training-ground",
+    "dev": "npm run dev -w training-ground",
+    "verify": "npm run verify -w training-ground"
   },
   "engines": {
     "node": ">=20"
